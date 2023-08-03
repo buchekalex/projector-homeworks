@@ -2,7 +2,7 @@ version: '3.8'
 services:
   app:
     build:
-      context: ..
+      context: .
       dockerfile: Dockerfile
     ports:
       - "8084:8080"
@@ -15,6 +15,11 @@ services:
     environment:
       - "API_HTTP_PORT=8080"
       - "MONGO_URI=mongodb://mongodb:27017"
+      - "APP_NAME=myapp"
+      - "APP_VERSION=0.1.0"
+      - "HTTP_PORT=8080"
+      - "LOG_LEVEL=debug"
+      - "ELASTIC_ADDRESS=http://elasticsearch:9200"
     labels:
       - "docker.group=docker"
 
@@ -48,8 +53,6 @@ services:
 
   grafana:
     image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
     networks:
       - projector
     volumes:
@@ -68,6 +71,8 @@ services:
       - INFLUXDB_USER=grafana
       - INFLUXDB_PASSWORD=grafana
       - DS_INFLUXDB=InfluxDB
+      - GF_SERVER_ROOT_URL=http://localhost:3000/grafana
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
     labels:
       - "docker.group=docker"
 
@@ -75,8 +80,6 @@ services:
     image: influxdb:1.8
     volumes:
       - influxdb_data:/var/lib/influxdb
-    ports:
-      - "8086:8086"
     networks:
       - projector
     environment:

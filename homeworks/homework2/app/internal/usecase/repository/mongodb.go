@@ -3,7 +3,8 @@ package repository
 import (
 	"context"
 	"errors"
-	"go-mongo-crud-rest-api/internal/model"
+	"go-mongo-crud-rest-api/internal/entitiy"
+	"go-mongo-crud-rest-api/internal/usecase"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -18,11 +19,11 @@ type repository struct {
 	db *mongo.Database
 }
 
-func NewRepository(db *mongo.Database) Repository {
+func NewRepository(db *mongo.Database) usecase.Repository {
 	return &repository{db: db}
 }
 
-func (r repository) GetUser(ctx context.Context, email string) (model.User, error) {
+func (r repository) GetUser(ctx context.Context, email string) (*entitiy.User, error) {
 	var out user
 	err := r.db.
 		Collection("users").
@@ -30,25 +31,25 @@ func (r repository) GetUser(ctx context.Context, email string) (model.User, erro
 		Decode(&out)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return model.User{}, ErrUserNotFound
+			return nil, ErrUserNotFound
 		}
-		return model.User{}, err
+		return nil, err
 	}
 	return toModel(out), nil
 }
 
-func (r repository) CreateUser(ctx context.Context, user model.User) (model.User, error) {
+func (r repository) CreateUser(ctx context.Context, user *entitiy.User) (*entitiy.User, error) {
 	out, err := r.db.
 		Collection("users").
 		InsertOne(ctx, fromModel(user))
 	if err != nil {
-		return model.User{}, err
+		return nil, err
 	}
 	user.ID = out.InsertedID.(primitive.ObjectID).String()
 	return user, nil
 }
 
-func (r repository) UpdateUser(ctx context.Context, user model.User) (model.User, error) {
+func (r repository) UpdateUser(ctx context.Context, user *entitiy.User) (*entitiy.User, error) {
 	in := bson.M{}
 	if user.Name != "" {
 		in["name"] = user.Name
@@ -60,10 +61,10 @@ func (r repository) UpdateUser(ctx context.Context, user model.User) (model.User
 		Collection("users").
 		UpdateOne(ctx, bson.M{"email": user.Email}, bson.M{"$set": in})
 	if err != nil {
-		return model.User{}, err
+		return nil, err
 	}
 	if out.MatchedCount == 0 {
-		return model.User{}, ErrUserNotFound
+		return nil, ErrUserNotFound
 	}
 	return user, nil
 }
@@ -88,7 +89,7 @@ type user struct {
 	Password string             `bson:"password,omitempty"`
 }
 
-func fromModel(in model.User) user {
+func fromModel(in *entitiy.User) user {
 	return user{
 		Name:     in.Name,
 		Email:    in.Email,
@@ -96,8 +97,8 @@ func fromModel(in model.User) user {
 	}
 }
 
-func toModel(in user) model.User {
-	return model.User{
+func toModel(in user) *entitiy.User {
+	return &entitiy.User{
 		ID:       in.ID.String(),
 		Name:     in.Name,
 		Email:    in.Email,

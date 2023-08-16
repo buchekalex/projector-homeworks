@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"context"
-	"go-mongo-crud-rest-api/internal/entitiy"
+	"go-mongo-crud-rest-api/internal/entity"
 )
 
 type UserUseCase struct {
@@ -10,7 +10,7 @@ type UserUseCase struct {
 	searchIndex SearchIndex
 }
 
-func (u UserUseCase) FindUser(ctx context.Context, email string) (*entitiy.User, error) {
+func (u UserUseCase) FindUser(ctx context.Context, email string) (*entity.User, error) {
 	user, err := u.searchIndex.FindUser(ctx, email)
 	if err != nil {
 		return nil, err
@@ -19,7 +19,7 @@ func (u UserUseCase) FindUser(ctx context.Context, email string) (*entitiy.User,
 	return user, nil
 }
 
-func (u UserUseCase) GetUser(ctx context.Context, email string) (*entitiy.User, error) {
+func (u UserUseCase) GetUser(ctx context.Context, email string) (*entity.User, error) {
 	user, err := u.repository.GetUser(ctx, email)
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func (u UserUseCase) GetUser(ctx context.Context, email string) (*entitiy.User, 
 	return user, nil
 }
 
-func (u UserUseCase) CreateUser(ctx context.Context, in *entitiy.User) (*entitiy.User, error) {
+func (u UserUseCase) CreateUser(ctx context.Context, in *entity.User) (*entity.User, error) {
 	user, err := u.repository.CreateUser(ctx, in)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (u UserUseCase) CreateUser(ctx context.Context, in *entitiy.User) (*entitiy
 	return user, nil
 }
 
-func (u UserUseCase) UpdateUser(ctx context.Context, in *entitiy.User) (*entitiy.User, error) {
+func (u UserUseCase) UpdateUser(ctx context.Context, in *entity.User) (*entity.User, error) {
 	user, err := u.repository.UpdateUser(ctx, in)
 	if err != nil {
 		return nil, err

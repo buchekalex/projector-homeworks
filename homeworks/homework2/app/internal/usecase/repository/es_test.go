@@ -1,13 +1,18 @@
+//go:build integration
+// +build integration
+
 package repository
 
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/go-elasticsearch/v8"
+	"go-mongo-crud-rest-api/internal/entity"
 	"go-mongo-crud-rest-api/internal/usecase"
 	nethttp "net/http"
 	"testing"
 	"time"
+
+	"github.com/elastic/go-elasticsearch/v8"
 )
 
 func Test_ElasticSearch(t *testing.T) {
@@ -17,6 +22,24 @@ func Test_ElasticSearch(t *testing.T) {
 	}
 
 	usr, err := searchIndex.FindUser(context.Background(), "ypWYMtxKFm")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(usr)
+}
+func Test_ElasticCreate(t *testing.T) {
+	searchIndex, err := NewElasticsearchIndex([]string{"http://localhost:9200"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	usr, err := searchIndex.CreateUser(context.Background(), &entity.User{
+		ID:       "someid",
+		Name:     "name",
+		Email:    "someemail",
+		Password: "somepass",
+	})
 	if err != nil {
 		t.Fatal(err)
 	}

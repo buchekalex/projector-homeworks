@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
-	"go-mongo-crud-rest-api/internal/entitiy"
+	"go-mongo-crud-rest-api/internal/entity"
 	"go-mongo-crud-rest-api/internal/usecase"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -23,7 +23,7 @@ func NewRepository(db *mongo.Database) usecase.Repository {
 	return &repository{db: db}
 }
 
-func (r repository) GetUser(ctx context.Context, email string) (*entitiy.User, error) {
+func (r repository) GetUser(ctx context.Context, email string) (*entity.User, error) {
 	var out user
 	err := r.db.
 		Collection("users").
@@ -38,7 +38,7 @@ func (r repository) GetUser(ctx context.Context, email string) (*entitiy.User, e
 	return toModel(out), nil
 }
 
-func (r repository) CreateUser(ctx context.Context, user *entitiy.User) (*entitiy.User, error) {
+func (r repository) CreateUser(ctx context.Context, user *entity.User) (*entity.User, error) {
 	out, err := r.db.
 		Collection("users").
 		InsertOne(ctx, fromModel(user))
@@ -49,7 +49,7 @@ func (r repository) CreateUser(ctx context.Context, user *entitiy.User) (*entiti
 	return user, nil
 }
 
-func (r repository) UpdateUser(ctx context.Context, user *entitiy.User) (*entitiy.User, error) {
+func (r repository) UpdateUser(ctx context.Context, user *entity.User) (*entity.User, error) {
 	in := bson.M{}
 	if user.Name != "" {
 		in["name"] = user.Name
@@ -89,7 +89,7 @@ type user struct {
 	Password string             `bson:"password,omitempty"`
 }
 
-func fromModel(in *entitiy.User) user {
+func fromModel(in *entity.User) user {
 	return user{
 		Name:     in.Name,
 		Email:    in.Email,
@@ -97,8 +97,8 @@ func fromModel(in *entitiy.User) user {
 	}
 }
 
-func toModel(in user) *entitiy.User {
-	return &entitiy.User{
+func toModel(in user) *entity.User {
+	return &entity.User{
 		ID:       in.ID.String(),
 		Name:     in.Name,
 		Email:    in.Email,

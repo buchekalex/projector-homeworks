@@ -2,7 +2,7 @@ package v1
 
 import (
 	"errors"
-	"go-mongo-crud-rest-api/internal/entitiy"
+	"go-mongo-crud-rest-api/internal/entity"
 	"go-mongo-crud-rest-api/internal/usecase"
 	"log"
 	"net/http"
@@ -31,6 +31,8 @@ func (s Server) GetUser(ctx *gin.Context) {
 		return
 	}
 
+	log.Printf("GetUser email %s", email)
+
 	user, err := s.user.GetUser(ctx, email)
 	if err != nil {
 		log.Printf("mongo GetUser: error: %s", err.Error())
@@ -46,7 +48,7 @@ func (s Server) GetUser(ctx *gin.Context) {
 }
 
 func (s Server) CreateUser(ctx *gin.Context) {
-	var user entitiy.User
+	var user entity.User
 	if err := ctx.ShouldBindJSON(&user); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
@@ -66,7 +68,7 @@ func (s Server) UpdateUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid argument email"})
 		return
 	}
-	var user entitiy.User
+	var user entity.User
 	if err := ctx.ShouldBindJSON(&user); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return

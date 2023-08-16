@@ -3,7 +3,6 @@
 # Use LC_ALL=C to handle non-ASCII characters
 export LC_ALL=C
 
-# Make exactly 1000 requests with curl
 for i in $(seq 1 100); do
     # Generate random user data
     id=$RANDOM

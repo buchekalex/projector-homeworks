@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/rs/zerolog/log"
-	"go-mongo-crud-rest-api/internal/entitiy"
+	"go-mongo-crud-rest-api/internal/entity"
 	"go-mongo-crud-rest-api/internal/usecase"
 	"net/http"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 
 	es8 "github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
@@ -88,7 +89,7 @@ func createIndexIfNotExists(esClient *es8.Client, index string) error {
 	return nil
 }
 
-func (er *ElasticsearchRepository) FindUser(ctx context.Context, email string) (*entitiy.User, error) {
+func (er *ElasticsearchRepository) FindUser(ctx context.Context, email string) (*entity.User, error) {
 	query := fmt.Sprintf(`{ "query": { "match": {"email" : "%s"} } }`, email)
 	resp, err := er.esClient.Search(
 		er.esClient.Search.WithIndex(er.index),
@@ -115,13 +116,13 @@ func (er *ElasticsearchRepository) FindUser(ctx context.Context, email string) (
 type esSearchResponse struct {
 	Hits struct {
 		Hits []struct {
-			Source entitiy.User `json:"_source"`
+			Source entity.User `json:"_source"`
 		} `json:"hits"`
 	} `json:"hits"`
 }
 
 // GetUser retrieves a user from Elasticsearch based on the given email.
-func (er *ElasticsearchRepository) GetUser(ctx context.Context, email string) (*entitiy.User, error) {
+func (er *ElasticsearchRepository) GetUser(ctx context.Context, email string) (*entity.User, error) {
 	query := fmt.Sprintf(`{ "query": { "term": {"email.keyword" : "%s"} } }`, email)
 	resp, err := er.esClient.Search(
 		er.esClient.Search.WithIndex(er.index),
@@ -146,7 +147,7 @@ func (er *ElasticsearchRepository) GetUser(ctx context.Context, email string) (*
 }
 
 // CreateUser creates a new user in Elasticsearch.
-func (er *ElasticsearchRepository) CreateUser(ctx context.Context, user *entitiy.User) (*entitiy.User, error) {
+func (er *ElasticsearchRepository) CreateUser(ctx context.Context, user *entity.User) (*entity.User, error) {
 	// Convert the user struct to JSON.
 	userJSON, err := json.Marshal(user)
 	if err != nil {
@@ -178,7 +179,7 @@ func (er *ElasticsearchRepository) CreateUser(ctx context.Context, user *entitiy
 }
 
 // UpdateUser updates an existing user in Elasticsearch.
-func (er *ElasticsearchRepository) UpdateUser(ctx context.Context, user *entitiy.User) (*entitiy.User, error) {
+func (er *ElasticsearchRepository) UpdateUser(ctx context.Context, user *entity.User) (*entity.User, error) {
 	// Convert the user struct to JSON.
 	userJSON, err := json.Marshal(user)
 	if err != nil {

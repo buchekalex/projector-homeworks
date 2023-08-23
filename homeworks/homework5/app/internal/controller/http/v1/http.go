@@ -2,11 +2,12 @@ package v1
 
 import (
 	"errors"
-	"github.com/google/uuid"
 	"go-mongo-crud-rest-api/internal/entity"
 	"go-mongo-crud-rest-api/internal/usecase"
 	"log"
 	"net/http"
+
+	"github.com/google/uuid"
 
 	"github.com/gin-gonic/gin"
 )
